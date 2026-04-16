@@ -63,34 +63,80 @@ if(menuContainer){
 }
 
 /* ========================
-   GALLERY (FIREBASE REMOVED)
-   -> SEKARANG KOSONG / STATIC ONLY
+   GALLERY (SUPABASE VERSION)
 ======================== */
 const gallery = document.getElementById("gallery");
 
-if(gallery){
+if (gallery) {
     const params = new URLSearchParams(window.location.search);
     const id = params.get("id");
 
-    gallery.innerHTML = `
-        <p style="text-align:center; width:100%;">
-            Gallery mode aktif (tanpa database)
-        </p>
-    `;
+    loadGallery(id);
 }
 
 /* ========================
-   UPLOAD BOX (DISABLED)
+   LOAD GALLERY
+======================== */
+function loadGallery(id){
+    gallery.innerHTML = "";
+
+    // langsung tampilkan upload box
+    createUploadBox();
+}
+
+/* ========================
+   UPLOAD BOX (SUPABASE)
 ======================== */
 function createUploadBox(){
-    let gallery = document.getElementById("gallery");
-    if(!gallery) return;
-
     let box = document.createElement("div");
     box.className = "img-placeholder";
-    box.innerText = "Upload disabled";
+    box.innerText = "Add Image";
+
+    let input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.style.display = "none";
+
+    box.onclick = ()=>input.click();
+
+    input.onchange = async function(e){
+        const file = e.target.files[0];
+        if(!file) return;
+
+        const fileName = Date.now() + "-" + file.name;
+
+        const { data, error } = await supabaseClient
+            .storage
+            .from("images")
+            .upload(fileName, file);
+
+        if(error){
+            alert("Upload gagal!");
+            console.log(error);
+            return;
+        }
+
+        const { data: urlData } = supabaseClient
+            .storage
+            .from("images")
+            .getPublicUrl(fileName);
+
+        addImageToGallery(urlData.publicUrl);
+    };
 
     gallery.appendChild(box);
+    gallery.appendChild(input);
+}
+
+/* ========================
+   ADD IMAGE TO GALLERY
+======================== */
+function addImageToGallery(url){
+    let img = document.createElement("img");
+    img.src = url;
+    img.onclick = ()=>showPopup(url);
+
+    gallery.insertBefore(img, gallery.firstChild);
 }
 
 /* ========================
