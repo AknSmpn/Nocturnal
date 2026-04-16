@@ -49,10 +49,11 @@ if(menuContainer){
         "Claudya",
         "Arya",
         "Vivi",
-        "Cesa"
+        "Cesa",
+        "Vina"
     ];
 
-    for(let i=1;i<=13;i++){
+    for(let i=1;i<=14;i++){
         let btn = document.createElement("button");
         btn.innerText = namaButton[i-1];
         btn.className = "menu-btn";
