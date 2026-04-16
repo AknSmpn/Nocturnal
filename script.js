@@ -1,31 +1,43 @@
-// FADE IN
+import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+import { collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+/* ========================
+   FADE IN
+======================== */
 document.addEventListener("DOMContentLoaded", ()=>{
     document.body.classList.add("show");
 });
 
 /* ========================
-   NAVIGATION
+   NAVIGATION (FIX MODULE)
 ======================== */
-function nextPage(){
+window.nextPage = function(){
     document.body.classList.remove("show");
     setTimeout(()=>{
         window.location.href = "menu.html";
     },300);
 }
 
-function goGallery(id){
+window.goGallery = function(id){
     document.body.classList.remove("show");
     setTimeout(()=>{
         window.location.href = "gallery.html?id=" + id;
     },300);
 }
 
+window.goBack = function(){
+    document.body.classList.remove("show");
+    setTimeout(()=>{
+        window.location.href = "menu.html";
+    },300);
+}
+
 /* ========================
    MENU GENERATE
 ======================== */
-const PeopleContainer = document.getElementById("menuContainer");
+const menuContainer = document.getElementById("menuContainer");
 
-if(PeopleContainer){
+if(menuContainer){
 
     const namaButton = [
         "Rehan",
@@ -42,7 +54,7 @@ if(PeopleContainer){
 
     for(let i=1;i<=10;i++){
         let btn = document.createElement("button");
-        btn.innerText = namaButton[i-1]; // <<< DIUBAH DI SINI SAJA
+        btn.innerText = namaButton[i-1];
         btn.className = "menu-btn";
         btn.style.animationDelay = (i * 0.1) + "s";
 
@@ -53,7 +65,7 @@ if(PeopleContainer){
 }
 
 /* ========================
-   GALLERY
+   GALLERY FIREBASE
 ======================== */
 const gallery = document.getElementById("gallery");
 
@@ -61,14 +73,54 @@ if(gallery){
     const params = new URLSearchParams(window.location.search);
     const id = params.get("id");
 
-    for(let i=1;i<=10;i++){
-        let box = document.createElement("div");
-        box.className = "img-placeholder";
+    const colRef = collection(db, "gallery_" + id);
 
-        box.innerText = "Add Image";
+    onSnapshot(colRef, (snapshot)=>{
+        gallery.innerHTML = "";
 
-        gallery.appendChild(box);
-    }
+        snapshot.forEach(doc=>{
+            let img = document.createElement("img");
+            img.src = doc.data().url;
+
+            img.onclick = ()=>showPopup(img.src);
+
+            gallery.appendChild(img);
+        });
+
+        createUploadBox(colRef);
+    });
+}
+
+/* ========================
+   UPLOAD BOX
+======================== */
+function createUploadBox(colRef){
+    let box = document.createElement("div");
+    box.className = "img-placeholder";
+    box.innerText = "Add Image";
+
+    let input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.style.display = "none";
+
+    box.onclick = ()=>input.click();
+
+    input.onchange = async function(e){
+        const file = e.target.files[0];
+
+        if(file){
+            const storageRef = ref(storage, "images/" + Date.now());
+
+            await uploadBytes(storageRef, file);
+            const url = await getDownloadURL(storageRef);
+
+            await addDoc(colRef, { url });
+        }
+    };
+
+    gallery.appendChild(box);
+    gallery.appendChild(input);
 }
 
 /* ========================
@@ -82,10 +134,4 @@ function showPopup(src){
 
 function closePopup(){
     document.getElementById("popup").style.display = "none";
-}
-function goBack(){
-    document.body.classList.remove("show");
-    setTimeout(()=>{
-        window.location.href = "menu.html";
-    },300);
 }

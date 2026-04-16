@@ -7,15 +7,39 @@
 </head>
 <body>
 
-<button class="btn-back" onclick="window.location.href='menu.html'">Back</button>
+<button class="btn-back" onclick="goBack()">← Back</button>
+
 <h2 class="judul">Gallery</h2>
 
 <div class="gallery" id="gallery"></div>
 
+<!-- POPUP -->
 <div class="popup" id="popup" onclick="closePopup()">
     <img id="popupImg">
 </div>
 
-<script src="script.js"></script>
+<!-- FIREBASE INIT -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getStorage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCAPKJhSQr3B1a5vHigUbuTsXwXWaIfBf0",
+  authDomain: "nocturnal-404.firebaseapp.com",
+  projectId: "nocturnal-404",
+  storageBucket: "nocturnal-404.firebasestorage.app",
+  messagingSenderId: "447376034350",
+  appId: "1:447376034350:web:839bde0a67f12d646dedbf"
+};
+
+const app = initializeApp(firebaseConfig);
+window.db = getFirestore(app);
+window.storage = getStorage(app);
+</script>
+
+<!-- SCRIPT -->
+<script type="module" src="script.js"></script>
+
 </body>
 </html>
