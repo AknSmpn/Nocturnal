@@ -1,22 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
-    document.body.classList.add("show"); // 🔥 FADE IN
     init();
 });
 
-/* ========================
-   BACK BUTTON (FIX GLOBAL)
-======================== */
-window.goBack = function(){
-    document.body.classList.remove("show");
-
-    setTimeout(()=>{
-        window.location.href = "menu.html";
-    },300);
-};
-
-/* ========================
-   INIT
-======================== */
 function init(){
 
     const gallery = document.getElementById("gallery");
@@ -31,9 +16,7 @@ function init(){
 
     loadImages(folder);
 
-    /* ========================
-       LOAD IMAGES
-    ======================== */
+    /* LOAD IMAGES */
     async function loadImages(folder){
         gallery.innerHTML = "";
 
@@ -65,15 +48,13 @@ function init(){
             }
 
         } catch (err) {
-            console.warn("SUPABASE ERROR:", err);
+            console.warn("ERROR:", err);
         }
 
         createUploadBox(folder);
     }
 
-    /* ========================
-       UPLOAD BOX
-    ======================== */
+    /* UPLOAD */
     function createUploadBox(folder){
 
         const box = document.createElement("div");
@@ -93,32 +74,26 @@ function init(){
 
             const fileName = Date.now() + "-" + file.name;
 
-            try {
-                const { error } = await supabase
-                    .storage
-                    .from("images")
-                    .upload(folder + "/" + fileName, file);
+            const { data, error } = await supabase.storage
+                .from("images")
+                .upload(folder + "/" + fileName, file);
 
-                if(error){
-                    console.error(error);
-                    alert("Upload gagal");
-                    return;
-                }
+            console.log("UPLOAD:", data, error);
 
-                loadImages(folder);
-
-            } catch (err) {
-                console.error("UPLOAD ERROR:", err);
+            if(error){
+                alert("Upload gagal: " + error.message);
+                return;
             }
+
+            alert("Upload berhasil!");
+            loadImages(folder);
         };
 
         gallery.appendChild(box);
         gallery.appendChild(input);
     }
 
-    /* ========================
-       POPUP
-    ======================== */
+    /* POPUP */
     window.showPopup = function(src){
         document.getElementById("popup").style.display = "flex";
         document.getElementById("popupImg").src = src;
@@ -127,4 +102,9 @@ function init(){
     window.closePopup = function(){
         document.getElementById("popup").style.display = "none";
     }
+}
+
+/* BACK */
+function goBack(){
+    window.location.href = "menu.html";
 }
