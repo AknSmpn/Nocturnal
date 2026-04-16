@@ -16,12 +16,14 @@ function init(){
 
     loadImages(folder);
 
-    /* LOAD IMAGES */
+    /* ========================
+       LOAD IMAGES
+    ======================== */
     async function loadImages(folder){
         gallery.innerHTML = "";
 
         try {
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .storage
                 .from("images")
                 .list(folder);
@@ -34,7 +36,7 @@ function init(){
                 data.forEach(file => {
                     if(!file.name) return;
 
-                    const { data: urlData } = supabase
+                    const { data: urlData } = supabaseClient
                         .storage
                         .from("images")
                         .getPublicUrl(folder + "/" + file.name);
@@ -54,7 +56,9 @@ function init(){
         createUploadBox(folder);
     }
 
-    /* UPLOAD */
+    /* ========================
+       UPLOAD
+    ======================== */
     function createUploadBox(folder){
 
         const box = document.createElement("div");
@@ -74,7 +78,7 @@ function init(){
 
             const fileName = Date.now() + "-" + file.name;
 
-            const { data, error } = await supabase.storage
+            const { data, error } = await supabaseClient.storage
                 .from("images")
                 .upload(folder + "/" + fileName, file);
 
@@ -93,7 +97,9 @@ function init(){
         gallery.appendChild(input);
     }
 
-    /* POPUP */
+    /* ========================
+       POPUP
+    ======================== */
     window.showPopup = function(src){
         document.getElementById("popup").style.display = "flex";
         document.getElementById("popupImg").src = src;
@@ -104,7 +110,9 @@ function init(){
     }
 }
 
-/* BACK */
+/* ========================
+   BACK
+======================== */
 function goBack(){
     window.location.href = "menu.html";
 }

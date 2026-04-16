@@ -19,11 +19,13 @@
     <img id="popupImg">
 </div>
 
-<!-- SUPABASE FIX -->
+<!-- SUPABASE (FIX GLOBAL) -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
 <script>
-const supabase = supabase.createClient(
+const { createClient } = supabase;
+
+const supabaseClient = createClient(
   "https://zlbbltgvhhszvdkuqmve.supabase.co",
   "sb_publishable_2O18NtGThhCRupWuDryOPw_b8VJQ4_5"
 );
