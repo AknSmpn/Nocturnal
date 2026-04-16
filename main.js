@@ -4,20 +4,14 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
 /* NAVIGATION */
 window.nextPage = function(){
-    document.body.classList.remove("show");
-    setTimeout(()=>{
-        window.location.href = "menu.html";
-    },300);
+    window.location.href = "menu.html";
 }
 
 window.goGallery = function(id){
-    document.body.classList.remove("show");
-    setTimeout(()=>{
-        window.location.href = "gallery.html?id=" + id;
-    },300);
+    window.location.href = "gallery.html?id=" + id;
 }
 
-/* MENU */
+/* MENU BUTTON */
 const menuContainer = document.getElementById("menuContainer");
 
 if(menuContainer){

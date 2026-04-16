@@ -1,108 +1,130 @@
+document.addEventListener("DOMContentLoaded", () => {
+    document.body.classList.add("show"); // 🔥 FADE IN
+    init();
+});
+
 /* ========================
-   BACK
+   BACK BUTTON (FIX GLOBAL)
 ======================== */
 window.goBack = function(){
-    window.location.href = "menu.html";
-}
+    document.body.classList.remove("show");
+
+    setTimeout(()=>{
+        window.location.href = "menu.html";
+    },300);
+};
 
 /* ========================
-   GALLERY
+   INIT
 ======================== */
-const gallery = document.getElementById("gallery");
+function init(){
 
-if(gallery){
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("id") || "default";
+    const gallery = document.getElementById("gallery");
 
-    loadImages(id);
-}
-
-/* ========================
-   LOAD IMAGES
-======================== */
-async function loadImages(folder){
-    gallery.innerHTML = "";
-
-    const { data, error } = await supabase
-        .storage
-        .from("images")
-        .list(folder);
-
-    if(error){
-        console.error("LIST ERROR:", error);
+    if(!gallery){
+        console.error("Gallery tidak ditemukan");
         return;
     }
 
-    if(data && data.length > 0){
-        data.forEach(file=>{
-            // skip folder
-            if(file.name.includes("/")) return;
+    const params = new URLSearchParams(window.location.search);
+    const folder = params.get("id") || "default";
 
-            const { data: publicUrl } = supabase
+    loadImages(folder);
+
+    /* ========================
+       LOAD IMAGES
+    ======================== */
+    async function loadImages(folder){
+        gallery.innerHTML = "";
+
+        try {
+            const { data, error } = await supabase
                 .storage
                 .from("images")
-                .getPublicUrl(folder + "/" + file.name);
-
-            let img = document.createElement("img");
-            img.src = publicUrl.publicUrl;
-
-            img.onclick = ()=>showPopup(publicUrl.publicUrl);
-
-            gallery.appendChild(img);
-        });
-    }
-
-    createUploadBox(folder);
-}
-
-/* ========================
-   UPLOAD
-======================== */
-function createUploadBox(folder){
-    let box = document.createElement("div");
-    box.className = "img-placeholder";
-    box.innerText = "Add Image";
-
-    let input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-    input.style.display = "none";
-
-    box.onclick = ()=>input.click();
-
-    input.onchange = async function(e){
-        const file = e.target.files[0];
-
-        if(file){
-            const fileName = Date.now() + "-" + file.name;
-
-            const { error } = await supabase.storage
-                .from("images")
-                .upload(folder + "/" + fileName, file);
+                .list(folder);
 
             if(error){
-                console.error("UPLOAD ERROR:", error);
-                return;
+                console.warn("LIST ERROR:", error);
             }
 
-            // reload setelah upload
-            loadImages(folder);
+            if(data){
+                data.forEach(file => {
+                    if(!file.name) return;
+
+                    const { data: urlData } = supabase
+                        .storage
+                        .from("images")
+                        .getPublicUrl(folder + "/" + file.name);
+
+                    const img = document.createElement("img");
+                    img.src = urlData.publicUrl;
+                    img.onclick = () => showPopup(urlData.publicUrl);
+
+                    gallery.appendChild(img);
+                });
+            }
+
+        } catch (err) {
+            console.warn("SUPABASE ERROR:", err);
         }
-    };
 
-    gallery.appendChild(box);
-    gallery.appendChild(input);
-}
+        createUploadBox(folder);
+    }
 
-/* ========================
-   POPUP
-======================== */
-function showPopup(src){
-    const popup = document.getElementById("popup");
-    popup.style.display = "flex";
-    document.getElementById("popupImg").src = src;
-}
+    /* ========================
+       UPLOAD BOX
+    ======================== */
+    function createUploadBox(folder){
 
-function closePopup(){
-    document.getElementById("popup").style.display = "none";
+        const box = document.createElement("div");
+        box.className = "img-placeholder";
+        box.innerText = "add image";
+
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/*";
+        input.style.display = "none";
+
+        box.onclick = () => input.click();
+
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+
+            const fileName = Date.now() + "-" + file.name;
+
+            try {
+                const { error } = await supabase
+                    .storage
+                    .from("images")
+                    .upload(folder + "/" + fileName, file);
+
+                if(error){
+                    console.error(error);
+                    alert("Upload gagal");
+                    return;
+                }
+
+                loadImages(folder);
+
+            } catch (err) {
+                console.error("UPLOAD ERROR:", err);
+            }
+        };
+
+        gallery.appendChild(box);
+        gallery.appendChild(input);
+    }
+
+    /* ========================
+       POPUP
+    ======================== */
+    window.showPopup = function(src){
+        document.getElementById("popup").style.display = "flex";
+        document.getElementById("popupImg").src = src;
+    }
+
+    window.closePopup = function(){
+        document.getElementById("popup").style.display = "none";
+    }
 }

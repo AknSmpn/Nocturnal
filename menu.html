@@ -5,16 +5,23 @@
 <title>People</title>
 <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <h2 class="judul">People</h2>
 
 <div class="menu-container" id="menuContainer"></div>
-<div id="menuContainer"></div>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
 
-<script src="script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<script>
+const supabase = window.supabase.createClient(
+  "https://zlbbltgvhhszvdkuqmve.supabase.co",
+  "ANON_KEY_KAMU"
+);
+</script>
+
 <script src="main.js"></script>
+
 </body>
 </html>

@@ -5,21 +5,24 @@
 <title>Nocturnal</title>
 <link rel="stylesheet" href="style.css">
 </head>
+
 <body class="center">
 
 <h1 class="title" onclick="nextPage()">Nocturnal</h1>
 
+<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
+<!-- CLIENT SUPABASE (WAJIB 1 SAJA) -->
 <script>
 const supabase = window.supabase.createClient(
-  "URL_KAMU",
+  "https://zlbbltgvhhszvdkuqmve.supabase.co",
   "ANON_KEY_KAMU"
 );
 </script>
 
-<script src="gallery.js"></script>
-<script src="script.js"></script>
 <script src="main.js"></script>
+<script src="gallery.js"></script>
+
 </body>
 </html>
