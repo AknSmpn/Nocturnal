@@ -12,7 +12,7 @@ const gallery = document.getElementById("gallery");
 
 if(gallery){
     const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
+    const id = params.get("id") || "default";
 
     loadImages(id);
 }
@@ -23,22 +23,30 @@ if(gallery){
 async function loadImages(folder){
     gallery.innerHTML = "";
 
-    const { data } = await supabase
+    const { data, error } = await supabase
         .storage
         .from("images")
         .list(folder);
 
-    if(data){
+    if(error){
+        console.error("LIST ERROR:", error);
+        return;
+    }
+
+    if(data && data.length > 0){
         data.forEach(file=>{
-            const url = supabase
+            // skip folder
+            if(file.name.includes("/")) return;
+
+            const { data: publicUrl } = supabase
                 .storage
                 .from("images")
-                .getPublicUrl(folder + "/" + file.name).data.publicUrl;
+                .getPublicUrl(folder + "/" + file.name);
 
             let img = document.createElement("img");
-            img.src = url;
+            img.src = publicUrl.publicUrl;
 
-            img.onclick = ()=>showPopup(url);
+            img.onclick = ()=>showPopup(publicUrl.publicUrl);
 
             gallery.appendChild(img);
         });
@@ -68,10 +76,16 @@ function createUploadBox(folder){
         if(file){
             const fileName = Date.now() + "-" + file.name;
 
-            await supabase.storage
+            const { error } = await supabase.storage
                 .from("images")
                 .upload(folder + "/" + fileName, file);
 
+            if(error){
+                console.error("UPLOAD ERROR:", error);
+                return;
+            }
+
+            // reload setelah upload
             loadImages(folder);
         }
     };

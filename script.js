@@ -1,6 +1,3 @@
-import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-import { collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
 /* ========================
    FADE IN
 ======================== */
@@ -66,7 +63,8 @@ if(menuContainer){
 }
 
 /* ========================
-   GALLERY FIREBASE
+   GALLERY (FIREBASE REMOVED)
+   -> SEKARANG KOSONG / STATIC ONLY
 ======================== */
 const gallery = document.getElementById("gallery");
 
@@ -74,54 +72,25 @@ if(gallery){
     const params = new URLSearchParams(window.location.search);
     const id = params.get("id");
 
-    const colRef = collection(db, "gallery_" + id);
-
-    onSnapshot(colRef, (snapshot)=>{
-        gallery.innerHTML = "";
-
-        snapshot.forEach(doc=>{
-            let img = document.createElement("img");
-            img.src = doc.data().url;
-
-            img.onclick = ()=>showPopup(img.src);
-
-            gallery.appendChild(img);
-        });
-
-        createUploadBox(colRef);
-    });
+    gallery.innerHTML = `
+        <p style="text-align:center; width:100%;">
+            Gallery mode aktif (tanpa database)
+        </p>
+    `;
 }
 
 /* ========================
-   UPLOAD BOX
+   UPLOAD BOX (DISABLED)
 ======================== */
-function createUploadBox(colRef){
+function createUploadBox(){
+    let gallery = document.getElementById("gallery");
+    if(!gallery) return;
+
     let box = document.createElement("div");
     box.className = "img-placeholder";
-    box.innerText = "Add Image";
-
-    let input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-    input.style.display = "none";
-
-    box.onclick = ()=>input.click();
-
-    input.onchange = async function(e){
-        const file = e.target.files[0];
-
-        if(file){
-            const storageRef = ref(storage, "images/" + Date.now());
-
-            await uploadBytes(storageRef, file);
-            const url = await getDownloadURL(storageRef);
-
-            await addDoc(colRef, { url });
-        }
-    };
+    box.innerText = "Upload disabled";
 
     gallery.appendChild(box);
-    gallery.appendChild(input);
 }
 
 /* ========================
