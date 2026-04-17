@@ -67,8 +67,11 @@ function init(){
                         .from("images")
                         .getPublicUrl(folder + "/" + file.name);
 
+                    if(!urlData || !urlData.publicUrl) return; // 🔥 FIX
+
                     const img = document.createElement("img");
                     img.src = urlData.publicUrl;
+                    img.onerror = () => img.remove(); // 🔥 HAPUS kalau rusak
                     img.onclick = () => showPopup(urlData.publicUrl);
 
                     gallery.appendChild(img);
