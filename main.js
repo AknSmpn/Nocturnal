@@ -17,10 +17,10 @@ const menuContainer = document.getElementById("menuContainer");
 if(menuContainer){
     const namaButton = [
         "Rehan","Daman","Leony","Ninis","Ehsan",
-        "Angga","Wildan","Cesta","Sanjaya","Claudya","Arya","Vivi","Cesa","Vina"
+        "Angga","Wildan","Cesta","Sanjaya","Claudya","Arya","Vivi","Cesa","Vina","Natasya"
     ];
 
-    for(let i=1;i<=14;i++){
+    for(let i=1;i<=15;i++){
         let btn = document.createElement("button");
         btn.innerText = namaButton[i-1];
         btn.className = "menu-btn";
