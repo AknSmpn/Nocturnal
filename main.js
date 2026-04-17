@@ -30,3 +30,7 @@ if(menuContainer){
         menuContainer.appendChild(btn);
     }
 }
+
+function back(){
+    window.location.href = "index.html";
+}
